@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+*.egg-info/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Databases
+*.db
+*.sqlite3
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Kaggle / Secrets
+kaggle.json
+.kaggle/
