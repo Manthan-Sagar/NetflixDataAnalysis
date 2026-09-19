@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Netflix Studio Intelligence — Global Catalog & Content Strategy</title>
+  <meta name="description" content="Executive SQL exploratory data analysis and content strategy dashboard for the Netflix Global Catalog. Built with pure SQL, SQLite, HTML5, and Vanilla CSS.">
+  
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js 4.4.1 -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Application CSS -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Ambient Background Gradients -->
+  <div class="bg-ambient"></div>
+
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="brand-section">
+      <div class="brand-badge">
+        <span class="brand-logo">NETFLIX</span>
+        <span class="brand-title">Studio Intelligence</span>
+        <span class="brand-subtitle">Executive Content Analytics</span>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="status-indicator">
+        <span class="status-dot"></span>
+        <span>SQLite 1NF Database Online</span>
+      </div>
+      <a href="#catalog" class="btn btn-secondary" onclick="document.querySelector('[data-tab=\'catalog\']').click()">
+        <span>Browse 8,797 Titles</span>
+      </a>
+      <a href="#memo" class="btn btn-primary" onclick="document.querySelector('[data-tab=\'memo\']').click()">
+        <span>Executive Briefing</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <div class="app-container">
+    
+    <!-- Dashboard Hero Header -->
+    <section class="dashboard-header">
+      <div class="header-meta">
+        <h1>Global Content Catalog & Acquisition Strategy</h1>
+        <p>A production-grade, SQL-normalized exploratory analysis of 8,797 titles. Uncovering the strategic pivot from legacy syndication to global originals, regional supply-chain risks, and content retention dynamics.</p>
+        <div class="header-tags">
+          <span class="tag-badge tag-sql">1NF Relational SQLite</span>
+          <span class="tag-badge">8,797 Titles</span>
+          <span class="tag-badge">19,303 Genre Junctions</span>
+          <span class="tag-badge">10,833 Country Mappings</span>
+          <span class="tag-badge">Publication 300 DPI Pipeline</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- KPI Metric Summary Cards -->
+    <section class="kpi-grid">
+      <!-- KPI 1 -->
+      <div class="kpi-card" style="--kpi-accent: var(--netflix-red);">
+        <div class="kpi-header">
+          <span class="kpi-label">Catalog Volume</span>
+          <span class="kpi-icon">📚</span>
+        </div>
+        <div class="kpi-value" id="kpi-total-titles">8,797</div>
+        <div class="kpi-footer">
+          <span class="kpi-pill pill-red">100%</span>
+          <span>Normalized Library Records</span>
+        </div>
+      </div>
+
+      <!-- KPI 2 -->
+      <div class="kpi-card" style="--kpi-accent: var(--netflix-red);">
+        <div class="kpi-header">
+          <span class="kpi-label">Feature Films</span>
+          <span class="kpi-icon">🎬</span>
+        </div>
+        <div class="kpi-value" id="kpi-movie-count">6,131</div>
+        <div class="kpi-footer">
+          <span class="kpi-pill pill-red" id="kpi-movie-pct">69.7%</span>
+          <span>Avg: <strong id="kpi-avg-movie-min" style="color:var(--text-primary);">99.6 min</strong></span>
+        </div>
+      </div>
+
+      <!-- KPI 3 -->
+      <div class="kpi-card" style="--kpi-accent: var(--accent-blue);">
+        <div class="kpi-header">
+          <span class="kpi-label">TV Series</span>
+          <span class="kpi-icon">📺</span>
+        </div>
+        <div class="kpi-value" id="kpi-tv-count">2,666</div>
+        <div class="kpi-footer">
+          <span class="kpi-pill pill-blue" id="kpi-tv-pct">30.3%</span>
+          <span>Avg: <strong id="kpi-avg-tv-seasons" style="color:var(--text-primary);">1.8 seasons</strong></span>
+        </div>
+      </div>
+
+      <!-- KPI 4 -->
+      <div class="kpi-card" style="--kpi-accent: var(--accent-amber);">
+        <div class="kpi-header">
+          <span class="kpi-label">Mature Audience Moat</span>
+          <span class="kpi-icon">🔞</span>
+        </div>
+        <div class="kpi-value" id="kpi-mature-pct">61.0%</div>
+        <div class="kpi-footer">
+          <span class="kpi-pill pill-amber" id="kpi-mature-count">5,364 titles</span>
+          <span>TV-MA & TV-14 Dominance</span>
+        </div>
+      </div>
+
+      <!-- KPI 5 -->
+      <div class="kpi-card" style="--kpi-accent: var(--accent-emerald);">
+        <div class="kpi-header">
+          <span class="kpi-label">Top 3 Country Share</span>
+          <span class="kpi-icon">🌐</span>
+        </div>
+        <div class="kpi-value" id="kpi-top3-pct">62.9%</div>
+        <div class="kpi-footer">
+          <span class="kpi-pill pill-emerald">US • IN • UK</span>
+          <span>High Supply Concentration</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Navigation Tabs -->
+    <nav class="tab-nav-container">
+      <div class="tabs-list">
+        <button class="tab-button active" data-tab="overview">
+          <span>Executive Overview</span>
+        </button>
+        <button class="tab-button" data-tab="content">
+          <span>Content & Genres</span>
+        </button>
+        <button class="tab-button" data-tab="geography">
+          <span>Global Footprint</span>
+        </button>
+        <button class="tab-button" data-tab="cadence">
+          <span>Cadence & Seasonality</span>
+        </button>
+        <button class="tab-button" data-tab="catalog">
+          <span>Catalog Explorer</span>
+          <span class="tab-badge">8,797</span>
+        </button>
+        <button class="tab-button" data-tab="memo">
+          <span>Strategy Memo & SQL Lab</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ========================================================================
+         TAB 1: EXECUTIVE OVERVIEW
+         ======================================================================== -->
+    <main id="tab-overview" class="tab-pane active">
+      <div class="analytics-grid">
+        
+        <!-- Strategic Pivot Line Chart (Main) -->
+        <div class="col-8 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>The Strategic Pivot: Production Vintage vs. Platform Ingestion (2005–2021)</h3>
+              <p>Tracking the inflection point from licensing legacy film catalogs to commissioned direct-to-consumer originals.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-takeaway" title="Toggle Strategic Context">
+                <span>⚡ Strategy Takeaway</span>
+              </button>
+              <button class="btn-card-action btn-sql" data-sql-key="strategic_pivot" title="View SQL">
+                <span>🔍 View SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container chart-container-tall">
+            <canvas id="chart-pivot-timeline"></canvas>
+          </div>
+          <div class="takeaway-drawer">
+            <strong>Strategic Context — Direct-to-Consumer Pivot:</strong>
+            Prior to 2015, Netflix built initial subscriber velocity by licensing vintage Hollywood studio libraries (peaking at release dates 5–10 years prior). Between 2016 and 2019, platform additions exploded (+370%), closing the lag between production release and ingestion to near-zero as Netflix transitioned into a full-scale digital studio producing proprietary originals.
+          </div>
+        </div>
+
+        <!-- Catalog Composition Donut -->
+        <div class="col-4 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Catalog Composition</h3>
+              <p>Macro volume split across content formats.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-takeaway">
+                <span>⚡ Takeaway</span>
+              </button>
+              <button class="btn-card-action btn-sql" data-sql-key="content_distribution">
+                <span>🔍 SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-composition"></canvas>
+          </div>
+          <div class="takeaway-drawer">
+            <strong>Strategic Context — The Retention Engine:</strong>
+            Feature films represent 69.7% of volume, acting as top-of-funnel acquisition drivers. However, episodic television (30.3%) drives higher customer lifetime value (LTV) and lowers monthly churn by sustaining multi-week viewing habits.
+          </div>
+        </div>
+
+        <!-- Audience Maturity Segmentation -->
+        <div class="col-4 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Audience Maturity Segmentation</h3>
+              <p>Demographic targeting across the entire platform.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-takeaway">
+                <span>⚡ Takeaway</span>
+              </button>
+              <button class="btn-card-action btn-sql" data-sql-key="ratings_distribution">
+                <span>🔍 SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-maturity-segments"></canvas>
+          </div>
+          <div class="takeaway-drawer">
+            <strong>Strategic Context — Adult Moat vs Family Opening:</strong>
+            Over 61% of catalog titles target adults and teens (TV-MA & TV-14). While this solidifies Netflix's dominance in prestige drama, kids/family programming comprises under 20%, leaving an exploitable moat for family-centric competitors like Disney+.
+          </div>
+        </div>
+
+        <!-- Top Producing Countries Pareto -->
+        <div class="col-8 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Geographic Supply Concentration & Pareto Cumulative Share</h3>
+              <p>Direct production and co-productions across top territories overlaid with cumulative %.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-takeaway">
+                <span>⚡ Takeaway</span>
+              </button>
+              <button class="btn-card-action btn-sql" data-sql-key="country_production">
+                <span>🔍 SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-country-pareto"></canvas>
+          </div>
+          <div class="takeaway-drawer">
+            <strong>Strategic Context — Supply Chain Vulnerability:</strong>
+            The Top 3 nations (US, India, UK) produce 62.9% of the catalog, and the Top 10 control 85.8%. This extreme concentration exposes the platform to regional licensing shifts and regulatory local-content quotas, motivating investments in South Korea, Spain, and Japan.
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Executive Findings Banner -->
+      <div class="memo-highlight-box">
+        <h4 style="font-weight:700; color:var(--text-primary); margin-bottom: 6px;">Executive Audit Summary for Strategy Interviews:</h4>
+        <p style="margin: 0; color: #CBD5E1; font-size: 13px;">
+          "Netflix transformed from a secondary video distributor to a primary cultural producer. By leveraging 1NF multi-table joins, this analysis proves that TV Series additions grew their annual share from 25.0% in 2018 to 33.7% in 2021, strategically mitigating the 67% single-season cancellation attrition while combating churn against emerging SVOD peers."
+        </p>
+      </div>
+    </main>
+
+    <!-- ========================================================================
+         TAB 2: CONTENT & GENRES
+         ======================================================================== -->
+    <section id="tab-content" class="tab-pane">
+      <div class="analytics-grid">
+        
+        <!-- Top 15 Genres Stacked Bar -->
+        <div class="col-12 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Top 15 Genre Classifications: Films vs. Episodic Series</h3>
+              <p>Relational 1NF decomposition reveals true category rankings without duplicate string corruption.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-takeaway">
+                <span>⚡ Strategy Takeaway</span>
+              </button>
+              <button class="btn-card-action btn-sql" data-sql-key="top_genres">
+                <span>🔍 View SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container chart-container-tall">
+            <canvas id="chart-top-genres"></canvas>
+          </div>
+          <div class="takeaway-drawer">
+            <strong>Strategic Genre Insights:</strong>
+            International Movies, Dramas, and Comedies form the foundational volume trio. In TV, International TV Shows and Crime TV Series represent the highest episodic investment. The high presence of Documentaries (512 titles) showcases Netflix's unscripted content offensive, which carries lower production budgets and high cultural engagement.
+          </div>
+        </div>
+
+        <!-- Movie Runtime Histogram -->
+        <div class="col-6 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Movie Duration Distributions</h3>
+              <p>Runtime bracket clustering across 6,131 feature films.</p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-movie-runtimes"></canvas>
+          </div>
+        </div>
+
+        <!-- TV Show Seasons Drop-off -->
+        <div class="col-6 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>TV Show Longevity & Attrition</h3>
+              <p>Series count drop-off across season counts.</p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-tv-seasons"></canvas>
+          </div>
+        </div>
+
+        <!-- Granular Ratings Breakdown -->
+        <div class="col-12 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Audience Rating Volume by Content Format</h3>
+              <p>Detailed breakdown across standard MPAA and TV Parental Guidelines brackets.</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-sql" data-sql-key="ratings_distribution">
+                <span>🔍 View SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-ratings"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 3: GLOBAL FOOTPRINT
+         ======================================================================== -->
+    <section id="tab-geography" class="tab-pane">
+      <div class="analytics-grid">
+        
+        <!-- Regional Radar -->
+        <div class="col-6 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Territorial Genre Specialization Radar</h3>
+              <p>Comparing production specialization across top international content hubs.</p>
+            </div>
+          </div>
+          <div class="chart-container chart-container-tall">
+            <canvas id="chart-regional-radar"></canvas>
+          </div>
+        </div>
+
+        <!-- Hub Strategic Profiles -->
+        <div class="col-6 visual-card" style="justify-content: center;">
+          <h3 style="font-size:16px; font-weight:700; margin-bottom:12px; color:var(--text-primary);">Key Regional Specialization Takeaways</h3>
+          <div style="display:flex; flex-direction:column; gap:14px; font-size:13px; color: #CBD5E1; line-height: 1.55;">
+            <div style="background:var(--bg-surface-elevated); padding:12px 16px; border-radius:6px; border-left:3px solid var(--netflix-red);">
+              <strong style="color:var(--text-primary);">United States (Anchor Generalist):</strong>
+              Produces the highest raw volume across all genres, dominating high-budget Documentaries (512 titles) and Comedies.
+            </div>
+            <div style="background:var(--bg-surface-elevated); padding:12px 16px; border-radius:6px; border-left:3px solid var(--accent-amber);">
+              <strong style="color:var(--text-primary);">India (Feature Film Engine):</strong>
+              Over 90% of catalog footprint is concentrated in full-length Bollywood and regional feature films (Dramas & International Movies), with minimal episodic television.
+            </div>
+            <div style="background:var(--bg-surface-elevated); padding:12px 16px; border-radius:6px; border-left:3px solid var(--accent-blue);">
+              <strong style="color:var(--text-primary);">South Korea & Japan (Niche Export Engines):</strong>
+              Uniquely specialized export engines. South Korea commands Romance/Crime K-dramas; Japan commands global Anime series with exceptionally high international engagement.
+            </div>
+            <div style="background:var(--bg-surface-elevated); padding:12px 16px; border-radius:6px; border-left:3px solid var(--accent-emerald);">
+              <strong style="color:var(--text-primary);">United Kingdom (Prestige Dramas & Documentaries):</strong>
+              Strong secondary hub specialized in period dramas, crime miniseries, and nature documentaries.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 4: CADENCE & SEASONALITY
+         ======================================================================== -->
+    <section id="tab-cadence" class="tab-pane">
+      <div class="analytics-grid">
+        
+        <!-- Monthly Seasonality -->
+        <div class="col-6 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Monthly Addition Seasonality (Calendar Pattern)</h3>
+              <p>Cumulative additions aggregated by calendar month (Jan - Dec).</p>
+            </div>
+            <div class="card-actions">
+              <button class="btn-card-action btn-takeaway">
+                <span>⚡ Takeaway</span>
+              </button>
+              <button class="btn-card-action btn-sql" data-sql-key="release_cadence">
+                <span>🔍 SQL</span>
+              </button>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-seasonality"></canvas>
+          </div>
+          <div class="takeaway-drawer">
+            <strong>Seasonal Surges:</strong>
+            Content additions peak during July (827 titles) and December (813 titles) to capture summer vacations and holiday screen time, followed by a seasonal trough in February (563 titles).
+          </div>
+        </div>
+
+        <!-- Day of Month Cadence -->
+        <div class="col-6 visual-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <h3>Day-of-Month Ingestion Clustering</h3>
+              <p>Revealing the pronounced "1st of the Month" licensing drop cadence.</p>
+            </div>
+          </div>
+          <div class="chart-container">
+            <canvas id="chart-day-cadence"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================
+         TAB 5: CATALOG EXPLORER
+         ======================================================================== -->
+    <section id="tab-catalog" class="tab-pane">
+      
+      <!-- Toolbar & Filters -->
+      <div class="catalog-toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="catalog-search" class="search-input" placeholder="Search by title, director, cast, or genre...">
+        </div>
+
+        <div class="filter-group">
+          <!-- Format Pills -->
+          <div class="type-pills">
+            <button class="type-pill-btn active" data-type="ALL">All</button>
+            <button class="type-pill-btn" data-type="Movie">Films</button>
+            <button class="type-pill-btn" data-type="TV Show">Series</button>
+          </div>
+
+          <!-- Dropdowns -->
+          <select id="filter-genre" class="filter-select">
+            <option value="ALL">All Genres</option>
+          </select>
+
+          <select id="filter-country" class="filter-select">
+            <option value="ALL">All Countries</option>
+          </select>
+
+          <select id="filter-rating" class="filter-select">
+            <option value="ALL">All Ratings</option>
+          </select>
+
+          <select id="filter-sort" class="filter-select">
+            <option value="year_desc">Newest Release</option>
+            <option value="year_asc">Oldest Release</option>
+            <option value="title_asc">Title (A-Z)</option>
+            <option value="date_added_desc">Recently Added</option>
+          </select>
+
+          <button id="btn-export-csv" class="btn btn-secondary btn-icon-text" title="Download Filtered Results as CSV">
+            <span>📥 Export CSV</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Table Container -->
+      <div class="table-card">
+        <div class="table-responsive">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th style="min-width: 240px;">Title</th>
+                <th style="width: 100px;">Format</th>
+                <th style="width: 80px;">Year</th>
+                <th style="width: 90px;">Rating</th>
+                <th style="width: 110px;">Duration</th>
+                <th>Genres</th>
+              </tr>
+            </thead>
+            <tbody id="catalog-table-body">
+              <!-- Dynamically rendered via app.js -->
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination Bar -->
+        <div class="pagination-bar">
+          <span id="catalog-results-count">Loading titles...</span>
+          <div class="pagination-controls">
+            <button id="btn-prev-page" class="btn-page" disabled>Previous</button>
+            <span id="pagination-info">Page 1 of 1</span>
+            <button id="btn-next-page" class="btn-page">Next</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ========================================================================
+         TAB 6: STRATEGY MEMO & SQL LAB
+         ======================================================================== -->
+    <section id="tab-memo" class="tab-pane">
+      <div class="memo-card">
+        <div class="memo-header">
+          <div class="memo-title">STRATEGIC MEMORANDUM: NETFLIX GLOBAL CATALOG AUDIT</div>
+          <div class="memo-meta-grid">
+            <div><strong>Target:</strong> Executive Committee & VP of Content Strategy</div>
+            <div><strong>Author:</strong> Senior Analytics & Data Strategy Lead</div>
+            <div><strong>Scope:</strong> 8,797 Normalized Records (SQLite 1NF)</div>
+            <div><strong>Focus:</strong> Churn Mitigation, Regional Supply, & Portfolio Risk</div>
+          </div>
+        </div>
+
+        <div class="memo-section">
+          <h3>1. Executive Summary & Core Strategic Takeaways</h3>
+          <p>This audit evaluates the architectural composition, acquisition velocity, and supply-chain concentration of Netflix's global catalog. Leveraging 1NF-normalized relational tables and pure SQL analytics, the analysis surfaces three headline strategic pillars:</p>
+          
+          <div class="memo-highlight-box">
+            <strong>Pillar A — The Retention Pivot:</strong> While Movies account for 69.7% of cumulative volume, TV Series expanded their share of annual additions from 25.0% in 2018 to 33.7% in 2021. Episodic television serves as the primary defense against monthly churn by sustaining continuous engagement.
+          </div>
+
+          <div class="memo-highlight-box">
+            <strong>Pillar B — Supply Chain Vulnerability:</strong> Content production remains excessively centralized: the Top 3 countries (US, India, UK) produce 62.9% of all titles, and the Top 10 control 85.8%, creating significant exposure to regional licensing expiration and foreign quota policies.
+          </div>
+
+          <div class="memo-highlight-box">
+            <strong>Pillar C — The Family Entertainment Deficit:</strong> Over 61% of the entire library is rated for mature audiences (TV-MA & TV-14). While this cements Netflix's brand in prestige adult drama, family/preschool programming remains under 20%, leaving a sizable moat for Disney+ and Apple TV+.
+          </div>
+        </div>
+
+        <div class="memo-section">
+          <h3>2. SQL Analytics Architecture</h3>
+          <p>All business calculations, multi-table joins, and windowed frequency distributions in this project are executed in standard SQL against an optimized SQLite relational schema:</p>
+          <div class="code-container">
+            <pre><code>-- 1NF Normalization: Multi-valued fields exploded into junction tables
+CREATE TABLE genre_map (show_id TEXT, genre TEXT, PRIMARY KEY (show_id, genre));
+CREATE TABLE country_map (show_id TEXT, country TEXT, PRIMARY KEY (show_id, country));
+
+-- Multi-table join aggregation for Top Genres:
+SELECT g.genre, COUNT(*) AS total_count,
+       SUM(CASE WHEN n.type = 'Movie' THEN 1 ELSE 0 END) AS movie_count,
+       SUM(CASE WHEN n.type = 'TV Show' THEN 1 ELSE 0 END) AS tv_count
+FROM genre_map g
+JOIN netflix_titles n ON g.show_id = n.show_id
+GROUP BY g.genre ORDER BY total_count DESC LIMIT 15;</code></pre>
+          </div>
+        </div>
+
+        <div class="memo-section">
+          <h3>3. Strategic Recommendations for Leadership</h3>
+          <ul style="padding-left: 20px; color: #CBD5E1; font-size: 13.5px; line-height: 1.7;">
+            <li><strong>Mitigate Season 1 Attrition:</strong> 67% of TV series cancel after Season 1. Commission 2-season guaranteed pilots for high-engagement IP to build subscriber loyalty.</li>
+            <li><strong>Diversify Beyond Top 3 Hubs:</strong> Accelerate studio investments across Latin America, South Korea, and Southeast Asia to hedge licensing concentration risks.</li>
+            <li><strong>Close the Family Moat:</strong> Bolster high-replay animated preschool programming to reduce household churn during summer breaks.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <div>
+        <strong>Netflix Global Catalog Analysis</strong> • Built for Technical & Strategic Leadership Interviews
+      </div>
+      <div>
+        SQLite 3 • Python ETL Pipeline • Chart.js • Pure Semantic HTML5 & CSS
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ========================================================================
+       MODAL 1: TITLE DETAIL MODAL
+       ======================================================================== -->
+  <div id="modal-title-detail" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span id="modal-detail-type" class="detail-type-badge kpi-pill pill-red">Film</span>
+          <h2 id="modal-detail-title" class="detail-title">Title Name</h2>
+          <div class="detail-meta-row">
+            <span id="modal-detail-year">2021</span>
+            <span>•</span>
+            <span id="modal-detail-rating" class="rating-tag rating-mature">TV-MA</span>
+            <span>•</span>
+            <span id="modal-detail-duration">112 min</span>
+            <span>•</span>
+            <span id="modal-detail-added">Added on 2021-09-15</span>
+          </div>
+        </div>
+        <button class="modal-close" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p id="modal-detail-desc" class="detail-desc">Synopsis goes here...</p>
+
+        <div class="detail-grid">
+          <div class="detail-key">Genres:</div>
+          <div id="modal-detail-genres" class="detail-val">Dramas, International</div>
+
+          <div class="detail-key">Director:</div>
+          <div id="modal-detail-director" class="detail-val">Jane Doe</div>
+
+          <div class="detail-key">Starring Cast:</div>
+          <div id="modal-detail-cast" class="detail-val">Actor One, Actor Two</div>
+
+          <div class="detail-key">Country:</div>
+          <div id="modal-detail-country" class="detail-val">United States</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: SQL INSPECTOR MODAL
+       ======================================================================== -->
+  <div id="modal-sql-inspector" class="modal-backdrop">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div>
+          <span class="detail-type-badge tag-badge tag-sql">Pure SQL Query</span>
+          <h2 id="sql-modal-title" class="detail-title">Query Title</h2>
+        </div>
+        <button class="modal-close" aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="sql-modal-takeaway" class="sql-modal-desc">Strategic takeaway description...</div>
+        
+        <div class="code-container">
+          <button id="btn-copy-sql" class="btn-copy">Copy SQL</button>
+          <pre><code id="sql-modal-code">SELECT * FROM netflix_titles;</code></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-compiled Database Aggregations -->
+  <script src="js/data.js"></script>
+
+  <!-- Core Application Logic -->
+  <script src="js/app.js"></script>
+</body>
+</html>

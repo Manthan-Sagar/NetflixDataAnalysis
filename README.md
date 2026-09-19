@@ -103,6 +103,13 @@ netflixAnalysis/
     │   ├── 05_country_production_concentration.png
     │   └── 06_release_cadence_seasonality.png
     └── insights_summary.md             # Executive strategic briefing memo
+├── web/                                # Interactive Interview Dashboard
+│   ├── index.html                      # Single-page executive dashboard
+│   ├── css/
+│   │   └── styles.css                  # Bespoke Netflix dark theme
+│   └── js/
+│       ├── app.js                      # Chart.js charts & search engine
+│       └── data.js                     # Pre-compiled database aggregations
 ```
 
 ---
@@ -132,6 +139,11 @@ python src/run_queries.py
 
 # 6. Launch narrative Jupyter Notebook
 jupyter notebook notebooks/eda_analysis.ipynb
+
+# 7. Launch Interactive Interview Analytics Web App
+# Simply double-click web/index.html in any browser, or run:
+python -m http.server 8080 --directory web
+# and open http://localhost:8080 in your browser
 ```
 
 ---
